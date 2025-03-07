@@ -17,7 +17,7 @@ interface Product {
   price: string;
 }
 
-const code = 'kHbE6XXNKoc7tADBHmurWcsWqVATc8S4w-od4H45x36IAzFuNhEWdA=='
+const code = ''
 
 function ProductsApp() {
   const [products, setProducts] = React.useState<Product[]>([])
@@ -26,7 +26,7 @@ function ProductsApp() {
   const [department, setDepartment] = React.useState<String | undefined>()
   const [productIds, setProductIds] = React.useState<Array<number>>([])
   const [productId, setProductId] = React.useState<number | undefined>()
-  // default key : kHbE6XXNKoc7tADBHmurWcsWqVATc8S4w-od4H45x36IAzFuNhEWdA==
+  
   React.useEffect(() => {
     (async () => {
       try {
