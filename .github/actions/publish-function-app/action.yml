@@ -1,0 +1,67 @@
+name: Publish Function App
+
+inputs:
+  appName: 
+    required: true
+  resourceGroupName: 
+    required: true
+  azureCredentials: 
+    required: true
+  nodeVersion:
+    required: false
+    default: "20.x"
+  packagePath: 
+    required: false
+    default: "./functions"
+
+runs:
+  using: composite
+  steps:
+    # Set up Node.js
+    - name: Setup Node $NODE_VERSION Environment
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ inputs.nodeVersion }}
+
+    # Log in to azure
+    - name: Login via Azure CLI
+      uses: azure/login@v1
+      with:
+        creds: ${{ inputs.azureCredentials }}
+    
+    # Fetch the publish profile using Azure CLI and output to an XML file
+    # https://github.com/Azure/azure-cli/issues/13777 for why "output tsv"
+    - name: Fetch Publish Profile
+      shell: pwsh
+      run: > 
+        az functionapp deployment list-publishing-profiles 
+        --resource-group ${{ inputs.resourceGroupName }} 
+        --name ${{ inputs.appName }} 
+        --xml
+        --output tsv > publishProfile.xml
+    
+    # Read the publish profile XML file content into a variable
+    - name: Read Publish Profile
+      id: get_profile
+      shell: pwsh
+      run: |
+        $PUB_IT = Get-Content -Path publishProfile.xml
+        Add-Content -Path $env:GITHUB_ENV -Value "publish_profile=$PUB_IT"
+           
+     # Run NPM install, build, and test
+    - name: Run npm install, build, and test
+      shell: pwsh
+      run: |
+        pushd '${{ inputs.packagePath }}'
+        npm install
+        npm run build --if-present
+        npm run test --if-present
+        popd
+
+   # Deploy the azure function
+    - name: 'Deploy Azure Functions'
+      uses: Azure/functions-action@v1
+      with:
+        app-name: ${{ inputs.appName }}
+        package: ${{ inputs.packagePath }}
+        publish-profile: ${{ inputs.publishProfile }}

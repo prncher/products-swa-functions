@@ -1,0 +1,15 @@
+{
+  "$schema": "https://aka.ms/azure/static-web-apps-cli/schema",
+  "configurations": {
+    "candlekeep-init": {
+      "env": "production",
+      "subscriptionId": "4acd39fc-4901-4d16-993d-dc0ef4136b46",
+      "tenantId": "701edd3e-c7a8-4789-b1ce-8a243620d68f",
+      "appLocation": "products-web",
+      "outputLocation": "build",
+      "appBuildCommand": "npm run build",
+      "run": "npm start",
+      "appDevserverUrl": "http://localhost:3000"
+    }
+  }
+}

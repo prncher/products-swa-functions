@@ -1,0 +1,44 @@
+name: Pull to branch with build and test (dev)
+run-name: ${{ github.actor }} requested a pull to master
+
+# Triggers on a pull request to master or production being ready for review
+on: 
+  pull_request:
+    on: ready_for_review
+    branches: 
+      - master
+
+jobs:
+  # setup the environment (dev)
+  dev-publish:
+    runs-on: prncher-cloudops
+    environment: 'dev'
+    steps:
+      # Check out repository
+      - name: 'Checkout GitHub Action'
+        uses: actions/checkout@v4
+        
+      # Call publish operation
+      - name: 'Publish Function App'
+        uses: './.github/actions/publish-function-app'
+        with:
+          appName: ${{ vars.AZURE_FUNCTION_APP_NAME }} 
+          resourceGroupName: ${{ vars.AZURE_RESOURCE_GROUP_NAME }} 
+          azureCredentials: ${{ secrets.AZURE_CREDENTIALS }}
+        
+  # On success, accept the PR (dev)
+  dev-approve-on-success:
+    needs: [dev-publish]
+    runs-on: windows-latest
+    if: ${{ always() && needs.dev-publish.result == 'success' }}
+    steps:
+      - name: Merge pull request
+        uses: actions/github-script@v7
+        with: 
+          script: |
+            const result = await github.rest.pulls.merge({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            })
+            

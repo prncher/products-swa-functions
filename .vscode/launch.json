@@ -1,0 +1,27 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+      {
+          "name": "Attach to Node Functions",
+          "type": "node",
+          "request": "attach",
+          "restart": true,
+          "port": 9229,
+          "preLaunchTask": "func: host start"
+      },
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "Jest: current file",
+        //"env": { "NODE_ENV": "test" },
+        "program": "${workspaceFolder}/functions/node_modules/jest/bin/jest.js",
+        "args": [
+          "${fileBasenameNoExtension}",
+          "--config",
+          "${workspaceFolder}/functions/jest.config.js"
+        ],
+        "console": "integratedTerminal",
+      }
+  
+  ]
+}
