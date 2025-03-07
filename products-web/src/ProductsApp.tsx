@@ -17,7 +17,7 @@ interface Product {
   price: string;
 }
 
-const code = ''
+const code = '' // Set the host key.
 
 function ProductsApp() {
   const [products, setProducts] = React.useState<Product[]>([])
@@ -26,6 +26,7 @@ function ProductsApp() {
   const [department, setDepartment] = React.useState<String | undefined>()
   const [productIds, setProductIds] = React.useState<Array<number>>([])
   const [productId, setProductId] = React.useState<number | undefined>()
+  const [initialized, setInitialized] = React.useState<boolean>(false)
   
   React.useEffect(() => {
     (async () => {
@@ -44,6 +45,7 @@ function ProductsApp() {
             setDepartments(['none', ...depts]);
             const productIds = products.map((p: Product) => p.id);
             setProductIds(['NaN', ...productIds]);
+            setInitialized(true);
             break;
           }
           default:
@@ -59,6 +61,9 @@ function ProductsApp() {
 
   React.useEffect(() => {
     (async () => {
+      if (!initialized){
+        return;
+      }
       let url = 'http://localhost:7071/api/products';
       try {
         if (department || productId) {
@@ -86,7 +91,7 @@ function ProductsApp() {
         console.log(e)
       }
     })();
-  }, [department, productId])
+  }, [department, productId, initialized])
 
   const ProductDetails = (product: Product) => {
     return <>
