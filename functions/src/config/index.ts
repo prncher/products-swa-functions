@@ -12,7 +12,7 @@ export const graphConfig = async () => {
   const { isLocal, kvUrl } = process.env;
 
   const config = {
-    tenant_id: '701edd3e-c7a8-4789-b1ce-8a243620d68f',
+    tenant_id: '',
     grant_type: 'client_credentials',
     scope: 'https://graph.microsoft.com/.default',
   }
@@ -33,8 +33,8 @@ export const graphConfig = async () => {
     }
     const kvClient = new SecretClient(kvUrl, credential);
 
-    const client_id = await kvClient.getSecret('ar-cdk-graph-clientid');
-    const devSecret = await kvClient.getSecret('ar-cdk-graph-secret');
+    const client_id = await kvClient.getSecret('clientid');
+    const devSecret = await kvClient.getSecret('secret');
 
     return {
       ...config,
@@ -51,7 +51,7 @@ export const mongoConfig = async () => {
   // Local config (not running on Azure)
   if (isLocal === "true") {
     return {
-      connectionString: "mongodb://127.0.0.1:41148",
+      connectionString: "mongodb://127.0.0.1:27017",
     }
   }
 
